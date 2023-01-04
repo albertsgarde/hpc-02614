@@ -2,14 +2,14 @@ TARGET	= libmatmult.so
 LIBSRCS	= matmult.c
 LIBOBJS	= matmult.o
 
-OPT	= -g 
+OPT	= -g -std=gnu99
 PIC	= -fPIC
 
 CC	= gcc
 CFLAGS= $(OPT) $(PIC) $(XOPTS)
 
 SOFLAGS = -shared 
-XLIBS	= 
+XLIBS	= -L /usr/lib64/atlas -lsatlas
 
 $(TARGET): $(LIBOBJS)
 	$(CC) -o $@ $(SOFLAGS) $(LIBOBJS) $(XLIBS)

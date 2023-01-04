@@ -1,3 +1,13 @@
+#include<cblas.h>
+
+void clearC(int m, int n, double **C) {
+  for (int i=0; i<m; i++) {
+    for (int j=0; j<n; j++) {
+      C[i][j] = 0;
+    }
+  }
+}
+
 void matmult_nat(int m, int n, int k, const double** A, const double** B, double** C) {
   clearC(m, n, C);
   for (int i=0; i<m; i++) {
@@ -11,7 +21,7 @@ void matmult_nat(int m, int n, int k, const double** A, const double** B, double
 
 void matmult_lib(int m, int n, int k, const double** A, const double** B, double** C) {
   clearC(m, n, C);
-  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, &A[0], k, &B[0], n, 0.0, &C[0], n);
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, *A, k, *B, n, 0.0, *C, n);
 }
 
 void matmult_mnk(int m, int n, int k, const double** A, const double** B, double** C) {
@@ -69,14 +79,6 @@ void matmult_knm(int m, int n, int k, const double** A, const double** B, double
       for (int i=0; i<m; i++) {
         C[i][j] += A[i][l] * B[l][j];
       }
-    }
-  }
-}
-
-void clearC(int m, int n, double **C) {
-  for (int i=0; i<m; i++) {
-    for (int j=0; j<n; j++) {
-      C[i][j] = 0;
     }
   }
 }
