@@ -1,5 +1,4 @@
 #include<cblas.h>
-#include<stdio.h>
 
 void clearC(int m, int n, double **C) {
   for (int i=0; i<m; i++) {
