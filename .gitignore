@@ -53,3 +53,6 @@ dkms.conf
 
 # Results
 *.dat
+*.er
+*.csv
+*.pdf
