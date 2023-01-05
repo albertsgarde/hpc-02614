@@ -4,6 +4,7 @@ import math
 import matplotlib
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
+from matplotlib.ticker import ScalarFormatter
 import pandas as pd
 import seaborn as sns
 from pathlib import Path
@@ -35,7 +36,12 @@ df = perf_df.merge(cache_df, on=["Type", "Size", "Block"])
 for cache in range(1, 4):
     df[f"L{cache}R"] = df[[f"L{cache}H", f"L{cache}M"]].apply(lambda row: row[1]/row[0] if row[0] != 0 else 0, axis=1)
 
-df = df[["Type", "Size", "Block", "Checksum", "Memory", "Time", "MFLOPs", "L1H", "L1M", "L1R", "L2H", "L2M", "L2R", "L3H", "L3M", "L3R"]]
+df = df[df["Type"] != "lib"]
+df["Type"] = df[["Type", "Block"]].apply(lambda row: f"{row[0]}{row[1]:.0f}", axis=1)
+
+df["Size"] = df["Size"].astype("int64")
+
+df = df[["Type", "Size", "Checksum", "Memory", "Time", "MFLOPs", "L1H", "L1M", "L1R", "L2H", "L2M", "L2R", "L3H", "L3M", "L3R"]]
 
 df.to_csv(all_data_path)
 
@@ -44,8 +50,11 @@ measurements = ["Time", "MFLOPs", "L1R", "L2R", "L3R"]
 
 for x_axis in x_axes:
     for measurement in measurements:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         plot_path = os.path.join(out_path, f"{measurement}_{x_axis}.pdf")
-        #["Type", "Block"]
         plot = sns.lineplot(df, x=x_axis, y=measurement, hue="Type")
-        plt.xscale('log')
+        ax.set_xscale('log', base=2)
+        #ax.set_yscale('log')
+        ax.yaxis.set_major_formatter(ScalarFormatter())
         plot.get_figure().savefig(plot_path)
