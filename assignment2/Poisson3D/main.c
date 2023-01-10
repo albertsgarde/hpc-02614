@@ -3,6 +3,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "alloc3d.h"
 #include "print.h"
 
@@ -14,20 +15,17 @@
 #include "gauss_seidel.h"
 #endif
 
+#include "init_u.h"
+#include "init_f.h"
+
 #define N_DEFAULT 100
 
 int
 main(int argc, char *argv[]) {
 
-    int 	N = N_DEFAULT;
-    int 	iter_max = 1000;
-    double	tolerance;
-    double	start_T;
-    int		output_type = 0;
-    char	*output_prefix = "poisson_res";
-    char    *output_ext    = "";
-    char	output_filename[FILENAME_MAX];
-    double 	***u = NULL;
+    char *output_prefix = "poisson_res";
+    char *output_ext    = "";
+    char output_filename[FILENAME_MAX];
 
 
     /* get the paramters from the command line */
@@ -35,19 +33,41 @@ main(int argc, char *argv[]) {
         printf("Usage: %s N iter_max tolerance start_T [output_type]", argv[0]);
         return(1);
     }
-    N         = atoi(argv[1]);	// grid size
-    iter_max  = atoi(argv[2]);  // max. no. of iterations
-    tolerance = atof(argv[3]);  // tolerance
-    start_T   = atof(argv[4]);  // start T for all inner grid points
-    if (argc == 6) {
-	    output_type = atoi(argv[5]);  // output type
+    const int N         = atoi(argv[1]);	// grid size
+    const int iter_max  = atoi(argv[2]);  // max. no. of iterations
+    const double tolerance = atof(argv[3]);  // tolerance
+    const double start_T   = atof(argv[4]);  // start T for all inner grid points
+    // Whether to use test boundary conditions and f.
+    bool test = false;
+    int output_type = 0;
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "-t") == 0) {
+            test = true;
+        } else {
+            output_type = atoi(argv[i]);
+        }
     }
 
     // allocate memory
-    if ( (u = malloc_3d(N, N, N)) == NULL ) {
+    double ***u = NULL;
+    if ( (u = malloc_3d(N+2, N+2, N+2)) == NULL ) {
         perror("array u: allocation failed");
         exit(-1);
     }
+
+    double ***f = NULL;
+    if ( (f = malloc_3d(N+2, N+2, N+2)) == NULL ) {
+        perror("array f: allocation failed");
+        exit(-1);
+    }
+
+    // initialize grid with boundary conditions.
+
+    init_u(N, u, start_T, test);
+    init_f(N, f, test);
+
+
+    // set boundary conditions
 
     /*
      *
@@ -57,6 +77,7 @@ main(int argc, char *argv[]) {
      */
 
     // dump  results if wanted 
+
     switch(output_type) {
 	case 0:
 	    // no output at all
@@ -65,13 +86,13 @@ main(int argc, char *argv[]) {
 	    output_ext = ".bin";
 	    sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
 	    fprintf(stderr, "Write binary dump to %s: ", output_filename);
-	    print_binary(output_filename, N, u);
+	    print_binary(output_filename, N+2, u);
 	    break;
 	case 4:
 	    output_ext = ".vtk";
 	    sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
 	    fprintf(stderr, "Write VTK file to %s: ", output_filename);
-	    print_vtk(output_filename, N, u);
+	    print_vtk(output_filename, N+2, u);
 	    break;
 	default:
 	    fprintf(stderr, "Non-supported output type!\n");
