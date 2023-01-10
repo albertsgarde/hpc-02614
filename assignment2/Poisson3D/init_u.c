@@ -11,7 +11,7 @@ void init_u_internal(const int N, double ***const u, const double start_T) {
     }
 }
 
-void init_u_corners(const int N, double ***const u) {
+void init_u_edges(const int N, double ***const u) {
     for (int i = 0; i < N+2; ++i) {
         u[i][0][0] = NAN;
         u[i][0][N+1] = NAN;
@@ -72,7 +72,7 @@ void init_u_boundary_test(const int N, double ***const u) {
 
 void init_u(const int N, double ***const u, const double start_T, const bool test) {
     init_u_internal(N, u, start_T);
-    init_u_corners(N, u);
+    init_u_edges(N, u);
     if (test) {
         init_u_boundary_test(N, u);
     } else {
