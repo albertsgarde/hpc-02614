@@ -70,7 +70,7 @@ void init_u_boundary_test(const int N, double ***const u) {
     }
 }
 
-int init_u(const int N, double ***const u, const double start_T, const bool test) {
+void init_u(const int N, double ***const u, const double start_T, const bool test) {
     init_u_internal(N, u, start_T);
     init_u_corners(N, u);
     if (test) {
