@@ -2,38 +2,33 @@
  * 
  */
 #include <math.h>
-#include "frobeniusnorm.c"
+#include "frobenius_norm.c"
 
-void jacobi(double ***U, double ***oldU, double ***f, int N, int kmax, double threshold) {
+void jacobi_inner(double *const *const *const U, double *const *const *const old_U, const double *const *const *const f, const int N) {
+
+    const double one_sixth = 1./6.;
+    // See comments in gauss_seidel.c
+    const double grid_size_sq = 1./(double)(N*N) ;
     
-    int k = 0;
-    int d = 100000000;
-
-    while (d > threshold && k < kmax) {
-
-        oldU = U;
-        jacobiInner(U, oldU, f, N);
-        d = frobeniusnorm(U, oldU, (N+2));
-        k += 1;
-    }
-
-}
-
-void jacobiInner(double ***U, double ***oldU, double ***f, int N) {
-
-    double one_sixth = 1/6;
-    double gridsizeSq = 1/(N*N) ;
-    
-    for (int i = 1; i < (N + 2); i++){
-        for (int j=1; j < (N + 2); j++){
-            for (int k=1; k < (N + 2); k++){
-
-                newval = (oldU[i-1][j][k] + oldU[i+1][j][k] +oldU[i][j-1][k] + oldU[i][j]+1[k] + oldU[i][j][k-1] + oldU[i][j][k+1])
-  
-                U[i][j][k] = one_sixth * (newval + gridsizeSq * f[i][j][k]);
+    for (int i = 1; i < (N + 1); i++){
+        for (int j=1; j < (N + 1); j++){
+            for (int k=1; k < (N + 1); k++){
+                U[i][j][k] = one_sixth * (old_U[i-1][j][k] + old_U[i+1][j][k] +old_U[i][j-1][k] + old_U[i][j+1][k] + old_U[i][j][k-1] + old_U[i][j][k+1] + grid_size_sq * f[i][j][k]);
             }
         }
     }
+}
 
+void jacobi(double *const *const * U, double *const *const * old_U, const double *const *const *const f, const int N, const int iter_max, const double threshold) {
+    int iter = 0;
+    double delta_norm = INFINITY;
 
+    while (delta_norm > threshold && iter < iter_max) {
+        double *const *const *const tmp = U;
+        U = old_U;
+        old_U = tmp;
+        jacobi_inner(U, old_U, f, N);
+        delta_norm = frobenius_norm((const double *const *const *)U, (const double *const *const *)old_U, N);
+        ++iter;
+    }
 }
