@@ -4,7 +4,7 @@
 #include <math.h>
 #include "frobenius_norm.c"
 
-void jacobi_inner(double *const *const *const u, double *const *const *const old_u, const double *const *const *const f, const int N) {
+void jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
 
     const double one_sixth = 1./6.;
     // See comments in gauss_seidel.c
@@ -19,16 +19,16 @@ void jacobi_inner(double *const *const *const u, double *const *const *const old
     }
 }
 
-void jacobi(double *const *const * u, double *const *const * old_u, const double *const *const *const f, const int N, const int iter_max, const double threshold) {
+void jacobi(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold) {
     int iter = 0;
     double delta_norm = INFINITY;
 
     while (delta_norm > threshold && iter < iter_max) {
-        double *const *const *const tmp = u;
+        double ***tmp = u;
         u = old_u;
         old_u = tmp;
         jacobi_inner(u, old_u, f, N);
-        delta_norm = frobenius_norm((const double *const *const *)u, (const double *const *const *)old_u, N);
+        delta_norm = frobenius_norm(u, old_u, N);
         ++iter;
     }
 }

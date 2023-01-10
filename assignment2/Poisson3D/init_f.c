@@ -9,7 +9,7 @@ double index_to_coord(const int N, const int index) {
     return 2.*((double)index)/((double)N+1.) - 1.;
 }
 
-void init_f_ass(const int N, double ***const f) {
+void init_f_ass(const int N, double ***f) {
     for (int i = 1; i < N+1; ++i) {
         for (int j = 1; j < N+1; ++j) {
             for (int k = 1; k < N+1; ++k) {
@@ -37,7 +37,7 @@ void init_f_ass(const int N, double ***const f) {
     }
 }
 
-void init_f_test(const int N, double ***const f) {
+void init_f_test(const int N, double ***f) {
     for (int i = 1; i < N+1; ++i) {
         for (int j = 1; j < N+1; ++j) {
             for (int k = 1; k < N+1; ++k) {
@@ -50,7 +50,7 @@ void init_f_test(const int N, double ***const f) {
     }
 }
 
-void init_f_edges(const int N, double ***const f) {
+void init_f_edges(const int N, double ***f) {
     for (int i = 0; i < N+2; ++i) {
         f[i][0][0] = NAN;
         f[i][0][N+1] = NAN;
@@ -71,7 +71,7 @@ void init_f_edges(const int N, double ***const f) {
     }
 }
 
-void init_f(const int N, double ***const f, const bool test) {
+void init_f(const int N, double ***f, const bool test) {
     if (test) {
         init_f_test(N, f);
     } else {

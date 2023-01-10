@@ -1,6 +1,6 @@
 #include <math.h>
 
-double frobenius_norm(const double *const *const *const A, const double *const *const *const B, const int N){
+double frobenius_norm(double ***A, double ***B, const int N){
 
     double norm = 0;
 

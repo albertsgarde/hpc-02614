@@ -1,1 +1,1 @@
-double frobenius_norm(const double *const *const *const A, const double *const *const *const B, const int N);
+double frobenius_norm(const double ***A, const double ***B, const int N);

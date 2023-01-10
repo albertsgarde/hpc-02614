@@ -4,7 +4,7 @@
 #include <math.h>
 
 double
-gauss_seidel_inner(double *const *const *const u, const double *const *const *const f, const int N) {
+gauss_seidel_inner(double ***u, double ***f, const int N) {
     double total_delta = 0;
 
     const double one_sixth = 1./6.;
@@ -28,7 +28,7 @@ gauss_seidel_inner(double *const *const *const u, const double *const *const *co
 }
 
 void
-gauss_seidel(double *const *const *const u, const double *const *const *const f, const int N, const int iter_max, const double threshold) {
+gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const double threshold) {
     
     int iter = 0;
     double delta_norm = INFINITY;

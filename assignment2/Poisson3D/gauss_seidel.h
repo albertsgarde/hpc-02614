@@ -5,6 +5,6 @@
 #define _GAUSS_SEIDEL_H
 
 void
-gauss_seidel(double *const *const *const u, const double *const *const *const f, const int N, const int iter_max, const double threshold);
+gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const double threshold);
 
 #endif
