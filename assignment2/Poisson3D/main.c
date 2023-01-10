@@ -49,32 +49,37 @@ main(int argc, char *argv[]) {
     }
 
     // allocate memory
-    double ***u = NULL;
+    double *** u = NULL;
     if ( (u = malloc_3d(N+2, N+2, N+2)) == NULL ) {
         perror("array u: allocation failed");
         exit(-1);
     }
 
-    double ***f = NULL;
+    double *** f = NULL;
     if ( (f = malloc_3d(N+2, N+2, N+2)) == NULL ) {
         perror("array f: allocation failed");
         exit(-1);
     }
 
-    // initialize grid with boundary conditions.
+    // initialize grid with boundary conditions
 
     init_u(N, u, start_T, test);
     init_f(N, f, test);
 
+    
+    #ifdef _JACOBI
+    double *** old_u = NULL;
+    if ( (old_u = malloc_3d(N+2, N+2, N+2)) == NULL ) {
+        perror("array old_u: allocation failed");
+        exit(-1);
+    }
+    init_u(N, old_u, start_T, test);
+    jacobi(u, old_u, f, N, iter_max, tolerance);
+    #endif
 
-    // set boundary conditions
-
-    /*
-     *
-     * fill in your code here 
-     *
-     *
-     */
+    #ifdef _GAUSS_SEIDEL
+    gauss_seidel(u, f, N, iter_max, tolerance);
+    #endif
 
     // dump  results if wanted 
 
