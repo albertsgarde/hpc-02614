@@ -11,7 +11,7 @@ jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
 
     const double one_sixth = 1./6.;
     const double grid_spacing_sq = grid_spacing(N)*grid_spacing(N);
-    
+
     #pragma omp for
     for (int i = 1; i < (N + 1); i++){
         for (int j=1; j < (N + 1); j++){
@@ -31,9 +31,11 @@ int jacobi(double *** u, double *** old_u, double ***f, const int N, const int i
     double delta_norm = INFINITY;
     double delta = 0.0;
 
-    #pragma omp parallel shared(iter,delta_norm,delta)
+    #pragma omp parallel shared(iter,delta_norm,delta, u, old_u, f, N, iter_max, threshold)
     {
     while (delta_norm > threshold && iter < iter_max) {
+        #pragma omp barrier
+        
         double ***tmp = u;
         u = old_u;
         old_u = tmp;
@@ -42,10 +44,13 @@ int jacobi(double *** u, double *** old_u, double ***f, const int N, const int i
         #pragma omp atomic
         delta += _delta;
 
-        delta_norm = sqrt(delta);
-
         #pragma omp master
+        {
+        delta_norm = sqrt(delta);
+        delta = 0.;
         ++iter;
+        }
+        #pragma omp barrier
     }
     }
     return iter;

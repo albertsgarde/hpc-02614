@@ -44,10 +44,14 @@ gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const do
         #pragma omp atomic
         delta += _delta;
 
-        delta_norm = sqrt(delta);
-
+        #pragma omp barrier
         #pragma omp master
+        {
+        delta_norm = sqrt(delta);
+        delta = 0.;
         ++iter;
+        }
+        #pragma omp barrier
     }
     }
 
