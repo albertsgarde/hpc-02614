@@ -27,9 +27,8 @@ gauss_seidel_inner(double ***u, double ***f, const int N) {
     return sqrt(total_delta);
 }
 
-void
+int
 gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const double threshold) {
-    
     int iter = 0;
     double delta_norm = INFINITY;
 
@@ -37,6 +36,8 @@ gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const do
         delta_norm = gauss_seidel_inner(u, f, N);
         ++iter;
     }
+
+    return iter;
 }
 
 

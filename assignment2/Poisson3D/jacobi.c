@@ -19,7 +19,7 @@ void jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
     }
 }
 
-void jacobi(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold) {
+int jacobi(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold) {
     int iter = 0;
     double delta_norm = INFINITY;
 
@@ -31,4 +31,5 @@ void jacobi(double *** u, double *** old_u, double ***f, const int N, const int 
         delta_norm = frobenius_norm(u, old_u, N);
         ++iter;
     }
+    return iter;
 }
