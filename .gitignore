@@ -56,3 +56,7 @@ dkms.conf
 *.er
 *.csv
 *.pdf
+*.vtk
+*.bin
+poisson_gs
+poisson_j
