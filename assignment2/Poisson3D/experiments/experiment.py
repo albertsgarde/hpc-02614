@@ -29,15 +29,17 @@ def run(config: RunConfig):
     if process.returncode != 0:
         print(err)
         sys.exit(1)
-    [time_string, num_iterations_string] = out.split(b' ')
+    [time_string, num_iterations_string, error_string] = out.split(b' ')
     time = float(time_string)
     num_iterations = int(num_iterations_string)
+    error = float(error_string)
     print(err)
-    row = [config.gauss_seidel, config.n, config.iter_max, config.tolerance, config.test, config.parallel, config.num_threads, config.schedule, time, num_iterations]
+    row = [config.gauss_seidel, config.n, config.iter_max, config.tolerance, config.test, config.parallel, config.num_threads, config.schedule, time, num_iterations, error]
     return row
 
 def experiment(configs, data_path: str):
     rows = [run(config) for config in configs]
-    df = pd.DataFrame(rows, columns=["gauss_seidel", "n", "iter_max", "tolerance", "test", "parallel", "num_threads", "schedule", "time", "num_iterations"])
+    df = pd.DataFrame(rows, columns=["gauss_seidel", "n", "iter_max", "tolerance", "test", "parallel", "num_threads", "schedule", "time", "num_iterations", "error"])
     df["iterations_per_second"] = df[["time", "num_iterations"]].apply(lambda row: row[1]/row[0], axis=1)
     df.to_csv(data_path)
+    return df
