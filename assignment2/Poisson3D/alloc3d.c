@@ -12,9 +12,6 @@ malloc_3d(int m, int n, int k) {
         return NULL;
     }
 
-#ifdef FIRST_TOUCH_ALL
-    #pragma omp parallel for
-#endif
     for(int i = 0; i < m; i++) {
         p[i] = (double **) p + m + i * n ;
     }
