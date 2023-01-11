@@ -71,7 +71,9 @@ main(int argc, char *argv[]) {
     init_u(N, u, start_T, test);
     init_f(N, f, test);
 
-    
+    double start_time, end_time;
+    // #pragma omp parallel
+    // {
     #ifdef _JACOBI
     double *** old_u = NULL;
     if ( (old_u = malloc_3d(N+2, N+2, N+2)) == NULL ) {
@@ -79,16 +81,17 @@ main(int argc, char *argv[]) {
         exit(-1);
     }
     init_u(N, old_u, start_T, test);
-    double start_time = omp_get_wtime();
+    start_time = omp_get_wtime();
     jacobi(u, old_u, f, N, iter_max, tolerance);
-    double end_time = omp_get_wtime();
+    end_time = omp_get_wtime();
     #endif
 
     #ifdef _GAUSS_SEIDEL
-    double start_time = omp_get_wtime();
+    start_time = omp_get_wtime();
     gauss_seidel(u, f, N, iter_max, tolerance);
-    double end_time = omp_get_wtime();
+    end_time = omp_get_wtime();
     #endif
+    // } // end of parallel
 
     double elapsed_time = end_time - start_time;
     printf("%f\n", elapsed_time);
