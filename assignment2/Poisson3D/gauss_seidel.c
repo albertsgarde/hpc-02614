@@ -11,7 +11,7 @@ gauss_seidel_inner(double ***u, double ***f, const int N) {
     const double one_sixth = 1./6.;
     const double grid_spacing_sq = grid_spacing(N)*grid_spacing(N);
 
-    #pragma omp parallel for ordered(2) default(shared) reduction(+: total_delta) schedule(static,1)
+    #pragma omp for ordered(2) schedule(static,1)
     for (int i = 1; i < (N + 1); i++){
         for (int j=1; j < (N + 1); j++){
             #pragma omp ordered depend(sink: i-1,j) depend(sink: i,j-1)
@@ -27,18 +27,28 @@ gauss_seidel_inner(double ***u, double ***f, const int N) {
             #pragma omp ordered depend(source)
         }
     }
-    return sqrt(total_delta);
+    return total_delta;
 }
 
 void
 gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const double threshold) {
-    
     int iter = 0;
     double delta_norm = INFINITY;
+    double delta = 0.0;
 
+    #pragma omp parallel shared(iter,delta_norm,delta)
+    {
     while (delta_norm > threshold && iter < iter_max) {
-        delta_norm = gauss_seidel_inner(u, f, N);
+        double _delta = gauss_seidel_inner(u, f, N);
+
+        #pragma omp atomic
+        delta += _delta;
+
+        delta_norm = sqrt(delta);
+
+        #pragma omp atomic
         ++iter;
+    }
     }
 }
 

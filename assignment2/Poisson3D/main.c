@@ -72,8 +72,6 @@ main(int argc, char *argv[]) {
     init_f(N, f, test);
 
     double start_time, end_time;
-    // #pragma omp parallel
-    // {
     #ifdef _JACOBI
     double *** old_u = NULL;
     if ( (old_u = malloc_3d(N+2, N+2, N+2)) == NULL ) {
@@ -91,7 +89,6 @@ main(int argc, char *argv[]) {
     gauss_seidel(u, f, N, iter_max, tolerance);
     end_time = omp_get_wtime();
     #endif
-    // } // end of parallel
 
     double elapsed_time = end_time - start_time;
     printf("%f\n", elapsed_time);
