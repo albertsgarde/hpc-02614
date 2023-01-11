@@ -37,7 +37,7 @@ void init_f_test(const int N, double ***f) {
                 double x = index_to_coord(N, i);
                 double y = index_to_coord(N, j);
                 double z = index_to_coord(N, k);
-                f[i][j][k] = 3*M_PI*sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
+                f[i][j][k] = 3*M_PI*M_PI*sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
             }
         }
     }

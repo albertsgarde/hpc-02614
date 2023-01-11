@@ -17,6 +17,7 @@
 
 #include "init_u.h"
 #include "init_f.h"
+#include "utils.h"
 #include "test_solution.h"
 #include "frobenius_norm.h"
 
@@ -27,6 +28,7 @@ main(int argc, char *argv[]) {
 
     char *output_prefix = "poisson_res";
     char *solution_output_prefix = "poisson_sol";
+    char *error_output_prefix = "poisson_err";
     char *output_ext    = "";
 
 
@@ -113,6 +115,17 @@ main(int argc, char *argv[]) {
 	        sprintf(solution_output_filename, "%s_%d%s", solution_output_prefix, N, output_ext);
             fprintf(stderr, "Write solution VTK file to %s: \n", solution_output_filename);
             print_vtk(solution_output_filename, N+2, solution);
+
+            double *** error_array = NULL;
+            if ( (error_array = malloc_3d(N+2, N+2, N+2)) == NULL ) {
+                perror("array error_array: allocation failed");
+                exit(-1);
+            }
+            subtract_arrays(N, u, solution, error_array);
+            char error_output_filename[FILENAME_MAX];
+	        sprintf(error_output_filename, "%s_%d%s", error_output_prefix, N, output_ext);
+            fprintf(stderr, "Write error VTK file to %s: \n", error_output_filename);
+            print_vtk(error_output_filename, N+2, error_array);
 
             const double error = frobenius_norm(u, solution, N);
             printf("Error: %f\n", error);

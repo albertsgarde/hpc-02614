@@ -3,17 +3,17 @@
  */
 #include <math.h>
 #include "frobenius_norm.h"
+#include "utils.h"
 
 void jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
 
     const double one_sixth = 1./6.;
-    // See comments in gauss_seidel.c
-    const double grid_size_sq = 1./(double)(N*N) ;
+    const double grid_spacing_sq = grid_spacing(N)*grid_spacing(N);
     
     for (int i = 1; i < (N + 1); i++){
         for (int j=1; j < (N + 1); j++){
             for (int k=1; k < (N + 1); k++){
-                u[i][j][k] = one_sixth * (old_u[i-1][j][k] + old_u[i+1][j][k] +old_u[i][j-1][k] + old_u[i][j+1][k] + old_u[i][j][k-1] + old_u[i][j][k+1] + grid_size_sq * f[i][j][k]);
+                u[i][j][k] = one_sixth * (old_u[i-1][j][k] + old_u[i+1][j][k] +old_u[i][j-1][k] + old_u[i][j+1][k] + old_u[i][j][k-1] + old_u[i][j][k+1] + grid_spacing_sq * f[i][j][k]);
             }
         }
     }

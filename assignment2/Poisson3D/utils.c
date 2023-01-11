@@ -8,6 +8,10 @@ double index_to_coord(const int N, const int index) {
     return 2.*((double)index)/((double)N+1.) - 1.;
 }
 
+double grid_spacing(const int N) {
+    return 2./(double)(N+1);
+}
+
 void init_edges(const int N, double ***a) {
     for (int i = 0; i < N+2; ++i) {
         a[i][0][0] = NAN;
@@ -26,5 +30,15 @@ void init_edges(const int N, double ***a) {
         a[0][N+1][k] = NAN;
         a[N+1][0][k] = NAN;
         a[N+1][N+1][k] = NAN;
+    }
+}
+
+void subtract_arrays(const int N, double ***A, double ***B, double ***C) {
+    for (int i = 0; i < N+2; ++i) {
+        for (int j = 0; j < N+2; ++j) {
+            for (int k = 0; k < N+2; ++k) {
+                C[i][j][k] = A[i][j][k] - B[i][j][k];
+            }
+        }
     }
 }
