@@ -26,7 +26,7 @@ jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
     return sqrt(total_delta);
 }
 
-void jacobi(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold) {
+int jacobi(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold) {
     int iter = 0;
     double delta_norm = INFINITY;
 
@@ -37,4 +37,5 @@ void jacobi(double *** u, double *** old_u, double ***f, const int N, const int 
         delta_norm = jacobi_inner(u, old_u, f, N);
         ++iter;
     }
+    return iter;
 }
