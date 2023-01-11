@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "alloc3d.h"
 #include "print.h"
 
@@ -78,12 +79,20 @@ main(int argc, char *argv[]) {
         exit(-1);
     }
     init_u(N, old_u, start_T, test);
+    double start_time = omp_get_wtime();
     jacobi(u, old_u, f, N, iter_max, tolerance);
+    double end_time = omp_get_wtime();
     #endif
 
     #ifdef _GAUSS_SEIDEL
+    double start_time = omp_get_wtime();
     gauss_seidel(u, f, N, iter_max, tolerance);
+    double end_time = omp_get_wtime();
     #endif
+
+    double elapsed_time = end_time - start_time;
+    printf("%f\n", elapsed_time);
+
 
     // dump  results if wanted 
 
@@ -128,7 +137,7 @@ main(int argc, char *argv[]) {
             print_vtk(error_output_filename, N+2, error_array);
 
             const double error = frobenius_norm(u, solution, N);
-            printf("Error: %f\n", error);
+            fprintf(stderr, "Error: %f\n", error);
         }
 	    break;
 	default:

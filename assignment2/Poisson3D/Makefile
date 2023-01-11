@@ -20,7 +20,7 @@ ISA	=
 CHIP	= 
 ARCH	= 
 PARA	= 
-CFLAGS	= $(DEFS) $(ARCH) $(OPT) $(ISA) $(CHIP) $(IPO) $(PARA) $(XOPTS) "-std=gnu11"
+CFLAGS	= $(DEFS) $(ARCH) $(OPT) $(ISA) $(CHIP) $(IPO) $(PARA) $(XOPTS) "-std=gnu11" -fopenmp 
 LDFLAGS = -lm 
 
 all: $(TARGET_J) $(TARGET_GS) 
