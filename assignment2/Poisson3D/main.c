@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <omp.h>
+#include <math.h>
 #include "alloc3d.h"
 #include "print.h"
 
@@ -79,6 +80,7 @@ main(int argc, char *argv[]) {
         exit(-1);
     }
     init_u(N, old_u, start_T, test);
+<<<<<<< HEAD
     start_time = omp_get_wtime();
     jacobi(u, old_u, f, N, iter_max, tolerance);
     end_time = omp_get_wtime();
@@ -88,12 +90,34 @@ main(int argc, char *argv[]) {
     start_time = omp_get_wtime();
     gauss_seidel(u, f, N, iter_max, tolerance);
     end_time = omp_get_wtime();
+=======
+    const double start_time = omp_get_wtime();
+    const int iterations = jacobi(u, old_u, f, N, iter_max, tolerance);
+    const double end_time = omp_get_wtime();
     #endif
 
-    double elapsed_time = end_time - start_time;
-    printf("%f\n", elapsed_time);
+    #ifdef _GAUSS_SEIDEL
+    const double start_time = omp_get_wtime();
+    const int iterations = gauss_seidel(u, f, N, iter_max, tolerance);
+    const double end_time = omp_get_wtime();
+>>>>>>> main
+    #endif
 
+    const double elapsed_time = end_time - start_time;
 
+    double *** solution = NULL;
+    double error = NAN;
+    if (test) {
+        if ( (solution = malloc_3d(N+2, N+2, N+2)) == NULL ) {
+            perror("array solution: allocation failed");
+            exit(-1);
+        }
+        test_solution(N, solution);
+
+        error = frobenius_norm(u, solution, N);
+    }
+
+    printf("%f %d %f\n", elapsed_time, iterations, error);
     // dump  results if wanted 
 
     char output_filename[FILENAME_MAX];
@@ -114,14 +138,16 @@ main(int argc, char *argv[]) {
 	    print_vtk(output_filename, N+2, u);
 
         if (test) {
-            double *** solution = NULL;
-            if ( (solution = malloc_3d(N+2, N+2, N+2)) == NULL ) {
-                perror("array solution: allocation failed");
+            if (solution == NULL) {
+                perror("solution array not created. Should be impossible when test is true.");
                 exit(-1);
             }
-            test_solution(N, solution);
+            if (error == NAN) {
+                perror("solution array not created. Should be impossible when test is true.");
+                exit(-1);
+            }
             char solution_output_filename[FILENAME_MAX];
-	        sprintf(solution_output_filename, "%s_%d%s", solution_output_prefix, N, output_ext);
+            sprintf(solution_output_filename, "%s_%d%s", solution_output_prefix, N, output_ext);
             fprintf(stderr, "Write solution VTK file to %s: \n", solution_output_filename);
             print_vtk(solution_output_filename, N+2, solution);
 
@@ -132,12 +158,9 @@ main(int argc, char *argv[]) {
             }
             subtract_arrays(N, u, solution, error_array);
             char error_output_filename[FILENAME_MAX];
-	        sprintf(error_output_filename, "%s_%d%s", error_output_prefix, N, output_ext);
+            sprintf(error_output_filename, "%s_%d%s", error_output_prefix, N, output_ext);
             fprintf(stderr, "Write error VTK file to %s: \n", error_output_filename);
             print_vtk(error_output_filename, N+2, error_array);
-
-            const double error = frobenius_norm(u, solution, N);
-            fprintf(stderr, "Error: %f\n", error);
         }
 	    break;
 	default:
