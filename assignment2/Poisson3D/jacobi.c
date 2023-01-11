@@ -31,14 +31,16 @@ int jacobi(double *** u, double *** old_u, double ***f, const int N, const int i
     double delta_norm = INFINITY;
     double delta = 0.0;
 
-    #pragma omp parallel shared(iter,delta_norm,delta, u, old_u, f, N, iter_max, threshold)
+    #pragma omp parallel shared(iter, delta_norm, delta, u, old_u, f, N, iter_max, threshold)
     {
     while (delta_norm > threshold && iter < iter_max) {
-        #pragma omp barrier
-        
+        #pragma omp master
+        {
         double ***tmp = u;
-        u = old_u;
+        u = old_u; // Add note that this caused problems only when thread num was 2 or sometimes on 3.
         old_u = tmp;
+        }
+        #pragma omp barrier
         double _delta = jacobi_inner(u, old_u, f, N);
 
         #pragma omp atomic
@@ -47,6 +49,7 @@ int jacobi(double *** u, double *** old_u, double ***f, const int N, const int i
         #pragma omp master
         {
         delta_norm = sqrt(delta);
+        //printf("delta_norm = %f\n", delta_norm);
         delta = 0.;
         ++iter;
         }
