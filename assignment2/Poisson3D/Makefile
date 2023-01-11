@@ -4,7 +4,7 @@ TARGET_J  = poisson_j		# Jacobi
 TARGET_GS = poisson_gs		# Gauss-Seidel
 
 SOURCES	= main.c print.c alloc3d.c
-OBJECTS	= print.o alloc3d.o init_u.o init_f.o
+OBJECTS	= print.o alloc3d.o frobenius_norm.o init_u.o init_f.o utils.o test_solution.o
 MAIN_J	= main_j.o
 MAIN_GS = main_gs.o
 OBJS_J	= $(MAIN_J) jacobi.o
@@ -45,6 +45,6 @@ realclean: clean
 
 # DO NOT DELETE
 
-main_j.o: main.c init_u.h init_f.h print.h jacobi.h
-main_gs.o: main.c init_u.h init_f.h print.h gauss_seidel.h
+main_j.o: main.c utils.h test_solution.h init_u.h init_f.h print.h jacobi.h
+main_gs.o: main.c utils.h test_solution.h init_u.h init_f.h print.h gauss_seidel.h
 print.o: print.h

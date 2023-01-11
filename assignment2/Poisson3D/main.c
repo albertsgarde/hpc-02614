@@ -17,6 +17,8 @@
 
 #include "init_u.h"
 #include "init_f.h"
+#include "test_solution.h"
+#include "frobenius_norm.h"
 
 #define N_DEFAULT 100
 
@@ -24,13 +26,13 @@ int
 main(int argc, char *argv[]) {
 
     char *output_prefix = "poisson_res";
+    char *solution_output_prefix = "poisson_sol";
     char *output_ext    = "";
-    char output_filename[FILENAME_MAX];
 
 
     /* get the paramters from the command line */
     if (argc < 5) {
-        printf("Usage: %s N iter_max tolerance start_T [output_type]", argv[0]);
+        printf("Usage: %s N iter_max tolerance start_T [output_type]\n", argv[0]);
         return(1);
     }
     const int N         = atoi(argv[1]);	// grid size
@@ -83,6 +85,7 @@ main(int argc, char *argv[]) {
 
     // dump  results if wanted 
 
+    char output_filename[FILENAME_MAX];
     switch(output_type) {
 	case 0:
 	    // no output at all
@@ -90,14 +93,30 @@ main(int argc, char *argv[]) {
 	case 3:
 	    output_ext = ".bin";
 	    sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
-	    fprintf(stderr, "Write binary dump to %s: ", output_filename);
+	    fprintf(stderr, "Write binary dump to %s: \n", output_filename);
 	    print_binary(output_filename, N+2, u);
 	    break;
 	case 4:
 	    output_ext = ".vtk";
 	    sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
-	    fprintf(stderr, "Write VTK file to %s: ", output_filename);
+	    fprintf(stderr, "Write VTK file to %s: \n", output_filename);
 	    print_vtk(output_filename, N+2, u);
+
+        if (test) {
+            double *** solution = NULL;
+            if ( (solution = malloc_3d(N+2, N+2, N+2)) == NULL ) {
+                perror("array solution: allocation failed");
+                exit(-1);
+            }
+            test_solution(N, solution);
+            char solution_output_filename[FILENAME_MAX];
+	        sprintf(solution_output_filename, "%s_%d%s", solution_output_prefix, N, output_ext);
+            fprintf(stderr, "Write solution VTK file to %s: \n", solution_output_filename);
+            print_vtk(solution_output_filename, N+2, solution);
+
+            const double error = frobenius_norm(u, solution, N);
+            printf("Error: %f\n", error);
+        }
 	    break;
 	default:
 	    fprintf(stderr, "Non-supported output type!\n");

@@ -2,7 +2,7 @@
  * 
  */
 #include <math.h>
-#include "frobenius_norm.c"
+#include "frobenius_norm.h"
 
 void jacobi_inner(double ***u, double ***old_u, double ***f, const int N) {
 

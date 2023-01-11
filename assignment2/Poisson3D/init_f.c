@@ -1,13 +1,6 @@
 #include <math.h>
 #include <stdbool.h>
-
-int coord_to_index(const int N, const double coord) {
-    return (int) (((int)N+1.)*(coord + 1.)/2.);
-}
-
-double index_to_coord(const int N, const int index) {
-    return 2.*((double)index)/((double)N+1.) - 1.;
-}
+#include "utils.h"
 
 void init_f_ass(const int N, double ***f) {
     for (int i = 1; i < N+1; ++i) {
@@ -50,27 +43,6 @@ void init_f_test(const int N, double ***f) {
     }
 }
 
-void init_f_edges(const int N, double ***f) {
-    for (int i = 0; i < N+2; ++i) {
-        f[i][0][0] = NAN;
-        f[i][0][N+1] = NAN;
-        f[i][N+1][0] = NAN;
-        f[i][N+1][N+1] = NAN;
-    }
-    for (int j = 0; j < N+2; ++j) {
-        f[0][j][0] = NAN;
-        f[0][j][N+1] = NAN;
-        f[N+1][j][0] = NAN;
-        f[N+1][j][N+1] = NAN;
-    }
-    for (int k = 0; k < N+2; ++k) {
-        f[0][0][k] = NAN;
-        f[0][N+1][k] = NAN;
-        f[N+1][0][k] = NAN;
-        f[N+1][N+1][k] = NAN;
-    }
-}
-
 void init_f(const int N, double ***f, const bool test) {
     if (test) {
         init_f_test(N, f);
@@ -78,5 +50,5 @@ void init_f(const int N, double ***f, const bool test) {
         init_f_ass(N, f);
     }
     // Set edges to NAN, since they should never be used.
-    init_f_edges(N, f);
+    init_edges(N, f);
 }
