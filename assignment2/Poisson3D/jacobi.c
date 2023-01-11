@@ -44,7 +44,7 @@ void jacobi(double *** u, double *** old_u, double ***f, const int N, const int 
 
         delta_norm = sqrt(delta);
 
-        #pragma omp atomic
+        #pragma omp master
         ++iter;
     }
     }

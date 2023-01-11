@@ -46,7 +46,7 @@ gauss_seidel(double ***u, double ***f, const int N, const int iter_max, const do
 
         delta_norm = sqrt(delta);
 
-        #pragma omp atomic
+        #pragma omp master
         ++iter;
     }
     }
