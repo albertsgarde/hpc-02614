@@ -72,7 +72,6 @@ main(int argc, char *argv[]) {
     init_u(N, u, start_T, test);
     init_f(N, f, test);
 
-    double start_time, end_time;
     // #pragma omp parallel
     // {
     #ifdef _JACOBI
