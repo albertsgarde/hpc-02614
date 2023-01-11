@@ -80,17 +80,6 @@ main(int argc, char *argv[]) {
         exit(-1);
     }
     init_u(N, old_u, start_T, test);
-<<<<<<< HEAD
-    start_time = omp_get_wtime();
-    jacobi(u, old_u, f, N, iter_max, tolerance);
-    end_time = omp_get_wtime();
-    #endif
-
-    #ifdef _GAUSS_SEIDEL
-    start_time = omp_get_wtime();
-    gauss_seidel(u, f, N, iter_max, tolerance);
-    end_time = omp_get_wtime();
-=======
     const double start_time = omp_get_wtime();
     const int iterations = jacobi(u, old_u, f, N, iter_max, tolerance);
     const double end_time = omp_get_wtime();
@@ -100,7 +89,6 @@ main(int argc, char *argv[]) {
     const double start_time = omp_get_wtime();
     const int iterations = gauss_seidel(u, f, N, iter_max, tolerance);
     const double end_time = omp_get_wtime();
->>>>>>> main
     #endif
 
     const double elapsed_time = end_time - start_time;
