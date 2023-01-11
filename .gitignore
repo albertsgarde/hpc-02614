@@ -60,5 +60,6 @@ __pycache__/
 *.pdf
 *.vtk
 *.bin
+*.err
 poisson_gs
 poisson_j

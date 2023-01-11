@@ -36,7 +36,7 @@ def run(config: RunConfig):
     row = [config.gauss_seidel, config.n, config.iter_max, config.tolerance, config.test, config.parallel, config.num_threads, config.schedule, time, num_iterations]
     return row
 
-def experiment(configs: list[RunConfig], data_path: str):
+def experiment(configs, data_path: str):
     rows = [run(config) for config in configs]
     df = pd.DataFrame(rows, columns=["gauss_seidel", "n", "iter_max", "tolerance", "test", "parallel", "num_threads", "schedule", "time", "num_iterations"])
     df["iterations_per_second"] = df[["time", "num_iterations"]].apply(lambda row: row[1]/row[0], axis=1)

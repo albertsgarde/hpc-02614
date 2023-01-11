@@ -1,5 +1,5 @@
 from experiment import RunConfig, experiment
 
-config = RunConfig(gauss_seidel=True, n=100, iter_max=10_000, tolerance=0)
+configs = [RunConfig(gauss_seidel=True, n=100, iter_max=iter_max, tolerance=0) for iter_max in range(100, 2000, 100)]
 
-experiment([config], "data.csv")
+experiment(configs, "data.csv")
