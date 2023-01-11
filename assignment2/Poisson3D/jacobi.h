@@ -6,6 +6,6 @@
 #ifndef _JACOBI_H
 #define _JACOBI_H
 
-double jacobi(double ***u, double ***old_u, double ***f, const int N, const int iter_max, const double threshold);
+int jacobi(double ***u, double ***old_u, double ***f, const int N, const int iter_max, const double threshold);
 
 #endif
