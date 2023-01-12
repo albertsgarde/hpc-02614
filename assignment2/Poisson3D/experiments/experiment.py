@@ -20,6 +20,8 @@ def run(config: RunConfig):
     env = os.environ.copy()
     env["OMP_NUM_THREADS"] = str(config.num_threads)
     env["OMP_SCHEDULE"] = config.schedule
+    # TODO: $ export OMP_PLACES={0}:8:8,{1}:8:8
+    #       $ export OMP_PROC_BIND=close
     bin = "poisson_" + ("gs" if config.gauss_seidel else "j")
     args = [bin, f"{config.n}", f"{config.iter_max}", f"{config.tolerance}", "0"] + (["-t"] if config.test else [])
     print(f"Running `{' '.join(args)}`")

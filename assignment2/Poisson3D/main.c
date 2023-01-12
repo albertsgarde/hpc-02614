@@ -68,9 +68,11 @@ main(int argc, char *argv[]) {
     }
 
     // initialize grid with boundary conditions
-
+    #pragma omp parallel shared(N, u, f, start_T, test)
+    {
     init_u(N, u, start_T, test);
     init_f(N, f, test);
+    }
 
     #ifdef _JACOBI
     double *** old_u = NULL;
