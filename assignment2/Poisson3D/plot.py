@@ -9,6 +9,7 @@ from matplotlib.colors import SymLogNorm
 import pandas as pd
 import seaborn as sns
 from pathlib import Path
+import numpy as np
 
 if len(sys.argv) < 3:
     raise Exception("Script takes two arguments: plot.py <data_path> <out_path>")
@@ -31,9 +32,23 @@ plot_path = os.path.join(out_path, "out.png")
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-plot = sns.lineplot(data=df, x="num_threads", y="speedup", hue="gauss_seidel", style="gauss_seidel", markers=True, dashes=False, ax=ax)
+
+f = 0.99
+num_threads = df.num_threads.unique()
+amdahl = 1.0/((1.0 - f) + f/num_threads)
+sns.lineplot(x=num_threads, y=amdahl, color="orange", label=f"amdahl f={f}")
+f = 0.9
+num_threads = df.num_threads.unique()
+amdahl = 1.0/((1.0 - f) + f/num_threads)
+sns.lineplot(x=num_threads, y=amdahl, color="blue", label=f"amdahl f={f}")
+
+
+sns.lineplot(data=df, x="num_threads", y="num_threads", color="green", label="linear",linestyle='--', ax=ax)
+plot = sns.lineplot(data=df, x="num_threads", y="speedup", hue="gauss_seidel", style="gauss_seidel", linestyle='', marker='o', dashes=False, ax=ax)
 
 ax.yaxis.set_major_formatter(ScalarFormatter())
 ax.legend(title="")
+ax.set_xlabel("Num. threads")
+ax.set_ylabel("Speedup")
+ax.set_title("Speedup for OMP_PROC_BIND=spread and N=100")
 plot.get_figure().savefig(plot_path)
-
