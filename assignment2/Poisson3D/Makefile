@@ -7,14 +7,14 @@ SOURCES	= main.c print.c alloc3d.c
 OBJECTS	= print.o alloc3d.o frobenius_norm.o init_u.o init_f.o utils.o test_solution.o
 MAIN_J	= main_j.o
 MAIN_GS = main_gs.o
-OBJS_J	= $(MAIN_J) jacobi.o
-OBJS_GS	= $(MAIN_GS) gauss_seidel.o
+OBJS_J	= jacobi_ser.o jacobi_par1.o jacobi_par2.o $(MAIN_J)
+OBJS_GS	= gauss_seidel_ser.o gauss_seidel_par1.o gauss_seidel_par2.o $(MAIN_GS)
 
 # options and settings for the GCC compilers
 #
 CC	= gcc
 DEFS	= 
-OPT	= -g 
+OPT	= -g -Ofast
 IPO	= 
 ISA	= 
 CHIP	= 
@@ -45,6 +45,6 @@ realclean: clean
 
 # DO NOT DELETE
 
-main_j.o: main.c utils.h test_solution.h init_u.h init_f.h print.h jacobi.h
-main_gs.o: main.c utils.h test_solution.h init_u.h init_f.h print.h gauss_seidel.h
+main_j.o: main.c utils.h test_solution.h init_u.h init_f.h print.h jacobi_ser.h jacobi_par1.h jacobi_par2.h
+main_gs.o: main.c utils.h test_solution.h init_u.h init_f.h print.h gauss_seidel_ser.h gauss_seidel_par1.h gauss_seidel_par2.h
 print.o: print.h
