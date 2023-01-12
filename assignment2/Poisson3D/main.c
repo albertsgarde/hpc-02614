@@ -13,12 +13,14 @@
 #include "jacobi_ser.h"
 #include "jacobi_par1.h"
 #include "jacobi_par2.h"
+#include "jacobi_par3.h"
 #endif
 
 #ifdef _GAUSS_SEIDEL
 #include "gauss_seidel_ser.h"
 #include "gauss_seidel_par1.h"
 #include "gauss_seidel_par2.h"
+#include "gauss_seidel_par3.h"
 #endif
 
 #include "init_u.h"
@@ -56,8 +58,8 @@ main(int argc, char *argv[]) {
             test = true;
         } else if (strcmp(argv[i], "-p") == 0) {
             parallel_level = atoi(argv[++i]);
-            if (parallel_level < 0 || parallel_level > 2) {
-                printf("Invalid parallel level. Must be 0, 1 or 2.\n");
+            if (parallel_level < 0 || parallel_level > 3) {
+                printf("Invalid parallel level. Must be 0, 1, 2, or 3.\n");
                 return(1);
             }
         } else {
@@ -102,6 +104,9 @@ main(int argc, char *argv[]) {
         case 2:
             iterations = jacobi_par2(u, old_u, f, N, iter_max, tolerance);
             break;
+        case 3:
+            iterations = jacobi_par3(u, old_u, f, N, iter_max, tolerance);
+            break;
     }
     const double end_time = omp_get_wtime();
     #endif
@@ -118,6 +123,9 @@ main(int argc, char *argv[]) {
             break;
         case 2:
             iterations = gauss_seidel_par2(u, f, N, iter_max, tolerance);
+            break;
+        case 3:
+            iterations = gauss_seidel_par3(u, f, N, iter_max, tolerance);
             break;
     }
     const double end_time = omp_get_wtime();
