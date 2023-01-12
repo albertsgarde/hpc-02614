@@ -10,11 +10,15 @@
 #include "print.h"
 
 #ifdef _JACOBI
-#include "jacobi.h"
+#include "jacobi_ser.h"
+#include "jacobi_par1.h"
+#include "jacobi_par2.h"
 #endif
 
 #ifdef _GAUSS_SEIDEL
-#include "gauss_seidel.h"
+#include "gauss_seidel_ser.h"
+#include "gauss_seidel_par1.h"
+#include "gauss_seidel_par2.h"
 #endif
 
 #include "init_u.h"
@@ -36,7 +40,7 @@ main(int argc, char *argv[]) {
 
     /* get the paramters from the command line */
     if (argc < 5) {
-        printf("Usage: %s N iter_max tolerance start_T [output_type]\n", argv[0]);
+        printf("Usage: %s N iter_max tolerance start_T [output_type] [-t] [-p parallel_level]\n", argv[0]);
         return(1);
     }
     const int N         = atoi(argv[1]);	// grid size
@@ -44,11 +48,18 @@ main(int argc, char *argv[]) {
     const double tolerance = atof(argv[3]);  // tolerance
     const double start_T   = atof(argv[4]);  // start T for all inner grid points
     // Whether to use test boundary conditions and f.
+    int parallel_level = 0;
     bool test = false;
     int output_type = 0;
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-t") == 0) {
             test = true;
+        } else if (strcmp(argv[i], "-p") == 0) {
+            parallel_level = atoi(argv[++i]);
+            if (parallel_level < 0 || parallel_level > 2) {
+                printf("Invalid parallel level. Must be 0, 1 or 2.\n");
+                return(1);
+            }
         } else {
             output_type = atoi(argv[i]);
         }
@@ -80,13 +91,35 @@ main(int argc, char *argv[]) {
     }
     init_u(N, old_u, start_T, test);
     const double start_time = omp_get_wtime();
-    const int iterations = jacobi(u, old_u, f, N, iter_max, tolerance);
+    int iterations;
+    switch (parallel_level) {
+        case 0:
+            iterations = jacobi_ser(u, old_u, f, N, iter_max, tolerance);
+            break;
+        case 1:
+            iterations = jacobi_par1(u, old_u, f, N, iter_max, tolerance);
+            break;
+        case 2:
+            iterations = jacobi_par2(u, old_u, f, N, iter_max, tolerance);
+            break;
+    }
     const double end_time = omp_get_wtime();
     #endif
 
     #ifdef _GAUSS_SEIDEL
     const double start_time = omp_get_wtime();
-    const int iterations = gauss_seidel(u, f, N, iter_max, tolerance);
+    int iterations;
+    switch (parallel_level) {
+        case 0:
+            iterations = gauss_seidel_ser(u, f, N, iter_max, tolerance);
+            break;
+        case 1:
+            iterations = gauss_seidel_par1(u, f, N, iter_max, tolerance);
+            break;
+        case 2:
+            iterations = gauss_seidel_par2(u, f, N, iter_max, tolerance);
+            break;
+    }
     const double end_time = omp_get_wtime();
     #endif
 
