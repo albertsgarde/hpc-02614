@@ -12,4 +12,3 @@ make realclean
 make
 . ../../env/bin/activate
 python3 experiments/parallel.py
-
