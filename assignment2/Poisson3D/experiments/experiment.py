@@ -6,7 +6,7 @@ import pandas as pd
 import subprocess
 
 class RunConfig:
-    def __init__(self, gauss_seidel: bool, n: int, iter_max: int, tolerance: float = 0, test: bool = False, parallel: bool = False, num_threads: int = 1, schedule: str = "static"):
+    def __init__(self, gauss_seidel: bool, n: int, iter_max: int, tolerance: float = 0, test: bool = False, parallel: int = 0, num_threads: int = 1, schedule: str = "static"):
         self.gauss_seidel = gauss_seidel
         self.n = n
         self.iter_max = iter_max
@@ -17,13 +17,12 @@ class RunConfig:
         self.schedule = schedule
 
 def run(config: RunConfig):
-    env = os.environ.copy()
-    env["OMP_NUM_THREADS"] = str(config.num_threads)
-    env["OMP_SCHEDULE"] = config.schedule
+    env_vars = { "OMP_NUM_THREADS": str(config.num_threads), "OMP_SCHEDULE": config.schedule }
+    env = {**os.environ.copy(), **env_vars}
     bin = "poisson_" + ("gs" if config.gauss_seidel else "j")
-    args = [bin, f"{config.n}", f"{config.iter_max}", f"{config.tolerance}", "0"] + (["-t"] if config.test else [])
-    print(f"Running `{' '.join(args)}`")
-    process = subprocess.Popen(args, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    args = [bin, f"{config.n}", f"{config.iter_max}", f"{config.tolerance}", "0"] + (["-t"] if config.test else []) + [f"-p {config.parallel}"]
+    print(f"Running `{' '.join([f'{key}={value}' for key,value in env_vars.items()])} {' '.join(args)}`")
+    process = subprocess.Popen(args, env=env, stdout=subprocess.PIPE)
 
     out, err = process.communicate()
     if process.returncode != 0:
@@ -33,7 +32,6 @@ def run(config: RunConfig):
     time = float(time_string)
     num_iterations = int(num_iterations_string)
     error = float(error_string)
-    print(err)
     row = [config.gauss_seidel, config.n, config.iter_max, config.tolerance, config.test, config.parallel, config.num_threads, config.schedule, time, num_iterations, error]
     return row
 
