@@ -50,7 +50,7 @@ main(int argc, char *argv[]) {
     const double tolerance = atof(argv[3]);  // tolerance
     const double start_T   = atof(argv[4]);  // start T for all inner grid points
     // Whether to use test boundary conditions and f.
-    int parallel_level = 0;
+    int parallel_level = 3;
     bool test = false;
     int output_type = 0;
     for (int i = 0; i < argc; ++i) {
