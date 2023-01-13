@@ -47,7 +47,7 @@ def run(config: RunConfig):
 def experiment(configs, data_path: str):
     print(f"Running {len(configs)} experiments...")
     rows = [run(config) for config in configs]
-    df = pd.DataFrame(rows, columns=["gauss_seidel", "n", "iter_max", "tolerance", "test", "parallel", "num_threads", "schedule", "time", "num_iterations", "error"])
+    df = pd.DataFrame(rows, columns=["gauss_seidel", "n", "iter_max", "tolerance", "test", "parallel", "num_threads", "schedule", "proc_bind", "time", "num_iterations", "error"])
     df["iterations_per_second"] = df[["time", "num_iterations"]].apply(lambda row: row[1]/row[0], axis=1)
     df.to_csv(data_path, index=False)
     return df
