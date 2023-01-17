@@ -52,6 +52,7 @@ def experiment(configs, data_path: str):
     rows = [run(config) for config in configs]
     df = pd.DataFrame(rows, columns=RunConfig.column_names() + ["time", "num_iterations", "error"])
     df["iterations_per_second"] = df[["time", "num_iterations"]].apply(lambda row: row[1]/row[0], axis=1)
+    os.makedirs(os.dirname(data_path))
     df.to_csv(data_path, index=False)
     return df
 
