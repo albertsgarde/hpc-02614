@@ -9,6 +9,7 @@ OBJS	= warm_up.o \
         print.o \
         jacobi_seq.o \
         jacobi_par.o \
+        jacobi_gpu_map.o \
         main.o \
 
 CC	= nvc
