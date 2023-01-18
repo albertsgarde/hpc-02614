@@ -20,4 +20,4 @@ make
 echo "Activating python environment."
 . ../../env/bin/activate
 echo "Running experiment script."
-python3 experiments/correctness.py
+python3 experiments/frobenius_cost.py

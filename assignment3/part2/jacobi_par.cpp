@@ -30,7 +30,7 @@ int jacobi_par(double *** u, double *** old_u, double ***f, const int N, const i
         old_u = tmp;
         jacobi_inner_par(u, old_u, f, N);
         if (frobenius) {
-            delta_norm = frobenius_norm(u, old_u, N);
+            delta_norm = frobenius_norm_par(u, old_u, N);
         }
         ++iter;
     }
