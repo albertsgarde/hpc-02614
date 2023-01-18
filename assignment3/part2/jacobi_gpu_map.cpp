@@ -27,9 +27,6 @@ void jacobi_inner_gpu_map(double ***u, double ***old_u, double ***f, const int N
 int jacobi_gpu_map(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold, const bool frobenius) {
     int iter = 0;
     double delta_norm = INFINITY;
-    
-    /* #pragma omp target enter data \
-        map(to: u[0:N][0:N][0:N]) map(alloc: old_u[0:N][0:N][0:N]) map(to: f[0:N][0:N][0:N]) */
 
     while (delta_norm > threshold && iter < iter_max) {
         double ***tmp = u;
@@ -41,10 +38,6 @@ int jacobi_gpu_map(double *** u, double *** old_u, double ***f, const int N, con
         }
         ++iter;
     }
-    
-    /* #pragma omp target update from(u[0:N][0:N][0:N])
-    #pragma omp target exit data \
-        map(release: u[0:N][0:N][0:N]) map(release: old_u[0:N][0:N][0:N]) map(release: f[0:N][0:N][0:N]) */
 
     return iter;
 }

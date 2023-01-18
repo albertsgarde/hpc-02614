@@ -3,6 +3,7 @@ OBJS	= warm_up.o \
         utils.o \
         frobenius_norm.o \
         alloc3d.o \
+        d_alloc3d.o \
         init_f.o \
         init_u.o \
         test_solution.o \
@@ -10,6 +11,7 @@ OBJS	= warm_up.o \
         jacobi_seq.o \
         jacobi_par.o \
         jacobi_gpu_map.o \
+        jacobi_gpu_mcp.o \
         main.o \
 
 CC	= nvc
