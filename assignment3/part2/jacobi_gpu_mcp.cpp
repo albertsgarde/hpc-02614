@@ -46,9 +46,7 @@ int jacobi_gpu_mcp(double *** u, double *** old_u, double ***f, const int N, con
         d_old_u = tmp;
         jacobi_inner_gpu_mcp(d_u, d_old_u, d_f, N);
         if (frobenius) {
-            printf("frobenius norm not supported in this version. frobenius norm not implemented for gpu\n");
-            exit(1);
-            delta_norm = frobenius_norm(d_u, d_old_u, N);
+            delta_norm = frobenius_norm_gpu(d_u, d_old_u, N);
         }
         ++iter;
     }
