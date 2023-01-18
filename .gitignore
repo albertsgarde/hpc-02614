@@ -63,3 +63,4 @@ __pycache__/
 *.err
 poisson_gs
 poisson_j
+poisson
