@@ -11,6 +11,8 @@
 
 #include "jacobi_seq.h"
 #include "jacobi_par.h"
+#include "jacobi_gpu_map.h"
+#include "jacobi_gpu_mcp.h"
 
 #include "init_u.h"
 #include "init_f.h"
@@ -29,7 +31,7 @@ void print_usage(char* argv[]) {
     printf("    start_t: inital value for all grid points\n");
     printf("    -h: print this help\n");
     printf("    -t: run on test data and output error\n");
-    printf("    -p: version. 'seq': sequential, 'par': parallel\n");
+    printf("    -p: version. 'seq': sequential, 'par': parallel, 'gpu_map': gpu offloading with implicit memory, 'gpu_mcp': gpu offloading with explicit mem_copy\n");
     printf("    -f: calculate Frobenius norm\n");
     printf("    -w: warm up\n");
 }
@@ -107,6 +109,10 @@ int main(int argc, char* argv[]) {
         poisson_func = jacobi_seq;
     } else if (strcmp(version, "par") == 0) {
         poisson_func = jacobi_par;
+    } else if (strcmp(version, "gpu_map") == 0) {
+        poisson_func = jacobi_gpu_map;
+    } else if (strcmp(version, "gpu_mcp") == 0) {
+        poisson_func = jacobi_gpu_mcp;
     } else {
         printf("Unknown version: %s", version);
         return 1;
