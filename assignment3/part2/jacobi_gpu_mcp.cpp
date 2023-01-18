@@ -2,6 +2,7 @@
  * 
  */
 #include <math.h>
+#include <stdio.h>
 #include "frobenius_norm.h"
 #include "utils.h"
 #include "d_alloc3d.h"
