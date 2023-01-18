@@ -61,6 +61,7 @@ __pycache__/
 *.vtk
 *.bin
 *.err
+*.ncu-rep
 poisson_gs
 poisson_j
 poisson

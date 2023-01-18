@@ -12,6 +12,7 @@ INC   = -I$(CUDA_ROOT)/include -I/appl/nvhpc/2022_2211/Linux_x86_64/22.11/exampl
 LIBS	=
 
 CXXFLAGS= $(OPT) $(PIC) $(INC) $(ISA) $(PARA) $(XOPT)
+CFLAGS= $(OPT) $(PIC) $(INC) $(ISA) $(PARA) $(XOPT)
 
 all: $(TARGET)
 
