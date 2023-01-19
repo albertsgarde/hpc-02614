@@ -21,7 +21,12 @@ void clearC(int m, int n, double **C) {
 
 extern "C" {
   void matmult_lib(int m, int n, int k, const double** A, const double** B, double** C) {
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, *A, k, *B, n, 0.0, *C, n);
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+    double alpha = 1.0;
+    double beta = 0.0;
+    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, *A, k, *B, n, &beta, *C, n);
+    cublasDestroy(handle);
   }
 }
 
