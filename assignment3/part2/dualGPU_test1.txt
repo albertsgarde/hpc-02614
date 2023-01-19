@@ -1,0 +1,10 @@
+Sequential
+3.054378 200 913.694139
+With parallelization 
+3.018644 200 913.694139
+With Offloading using map
+3.009635 200 913.694139
+With Offloading and memcpy
+0.131205 200 913.694139
+With Asynchrounous Offloading and dual GPUs  
+2.158069 200 913.687385

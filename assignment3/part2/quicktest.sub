@@ -2,7 +2,7 @@
 #BSUB -J poisson
 #BSUB -o poisson_%J.out
 #BSUB -e poisson_%J.err
-#BSUB -q hpcintrogpush
+#BSUB -q hpcintrogpu
 #BSUB -n 12
 #BSUB -gpu "num=2:mode=exclusive_process"
 #BSUB -W 0:05

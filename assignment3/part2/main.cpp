@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     bool test = false;
     bool frobenius = false;
     bool do_warm_up = false;
+    bool do_warm_up2 = false;
     int output_type = 0;
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-h") == 0) {
@@ -72,7 +73,9 @@ int main(int argc, char* argv[]) {
             frobenius = true;
         } else if (strcmp(argv[i], "-w") == 0) {
             do_warm_up = true;
-        } else {
+        } else if (strcmp(argv[i], "-w2") == 0) {
+            do_warm_up2 = true;}
+        else {
             output_type = atoi(argv[i]);
         }
     }
@@ -103,6 +106,13 @@ int main(int argc, char* argv[]) {
 
     if (do_warm_up) {
         warm_up();
+    }
+
+    if (do_warm_up2) {
+        for (int w=0; w < 2; w++){
+            omp_set_default_device(w);
+            warm_up();
+        }
     }
 
     int (*poisson_func)(double***, double***, double***, int, int, double, bool);
