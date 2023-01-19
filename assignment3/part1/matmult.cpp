@@ -21,12 +21,8 @@ void clearC(int m, int n, double **C) {
 
 extern "C" {
   void matmult_lib(int m, int n, int k, const double** A, const double** B, double** C) {
-    cublasHandle_t handle;
-    cublasCreate(&handle);
-    double alpha = 1.0;
-    double beta = 0.0;
-    cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, *A, k, *B, n, &beta, *C, n);
-    cublasDestroy(handle);
+    clearC(m, n, C);
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, 1.0, *A, k, *B, n, 0.0, *C, n);
   }
 }
 
@@ -72,36 +68,13 @@ extern "C" {
 
     #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) 
     {
-      #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
+      #pragma omp target teams distribute parallel for map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
                   num_teams(m) thread_limit(64)
       for (int i=0; i<m; i++) {
-        #pragma omp loop bind(parallel)
         for (int l=0; l<k; l++) {
           for (int j=0; j<n; j++) {
             C[i][j] += A[i][l] * B[l][j];
           }
-        }
-      }
-    }
-  }
-}
-
-extern "C" {
-  void matmult_mnk_offload(int m, int n, int k, const double** A, const double** B, double** C) {
-    clearC(m, n, C);
-
-    #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) 
-    {
-      #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
-                    num_teams(m) thread_limit(64)
-      for (int i=0; i<m; i++) {
-        #pragma omp loop bind(parallel)
-        for (int j=0; j<n; j++) {
-          double sum = 0;
-          for (int l=0; l<k; l++) {
-            sum += A[i][l] * B[l][j];
-          }
-          C[i][j] = sum;
         }
       }
     }
@@ -140,5 +113,71 @@ extern "C" {
         }
       }
     }
+  }
+}
+
+extern "C" {
+  void matmult_mnk_offload(int m, int n, int k, const double** A, const double** B, double** C) {
+    clearC(m, n, C);
+
+    #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
+                  num_teams(m) thread_limit(64)
+    for (int i=0; i<m; i++) {
+      #pragma omp loop bind(parallel)
+      for (int j=0; j<n; j++) {
+        double sum = 0;
+        for (int l=0; l<k; l++) {
+          sum += A[i][l] * B[l][j];
+        }
+        C[i][j] = sum;
+      }
+    }
+  }
+}
+
+
+#define NUM_SLABS 4
+
+extern "C" {
+  void matmult_asy_offload(int m, int n, int k, const double** A, const double** B, double** C) {
+    clearC(m, n, C);
+
+    for (int slab = 0; slab < NUM_SLABS; slab++) {
+      const int slab_start = slab * m / NUM_SLABS;
+      const int slab_length = (slab+1)* m / NUM_SLABS-slab_start;
+
+      #pragma omp target teams loop nowait map(to:A[slab_start:slab_length][:k],B[:k][:n],m,n,k) map(tofrom:C[slab_start:slab_length][:n]) \
+                  num_teams(slab_length) thread_limit(64)
+      for (int i=slab_start; i<slab_start+slab_length; i++) {
+        #pragma omp loop bind(parallel)
+        for (int j=0; j<n; j++) {
+          double sum = 0;
+          for (int l=0; l<k; l++) {
+            sum += A[i][l] * B[l][j];
+          }
+          C[i][j] = sum;
+        }
+      }
+    }
+    #pragma omp taskwait
+  }
+}
+
+extern "C" {
+  void matmult_lib_offload(int m, int n, int k, const double** A, const double** B, double** C) {
+    clearC(m, n, C);
+
+    cublasHandle_t handle;
+    cublasCreate(&handle);
+    double alpha = 1.0;
+    double beta = 0.0;
+    const double* a = *A;
+    const double* b = *B;
+    double* c = *C;
+    #pragma omp target data map(to:a[:m*k],b[:k*n]) map(tofrom:c[:m*n]) use_device_ptr(a,b,c)
+    {
+      cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, a, k, b, n, &beta, c, n);
+    }
+    cublasDestroy(handle);
   }
 }
