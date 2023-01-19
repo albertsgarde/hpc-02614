@@ -112,19 +112,18 @@ extern "C" {
       for (int i1=0; i1<m; i1+=BLK_GPU_BS) {
         for (int j=0; j<n; j++) {
           if (m-i1 > BLK_GPU_BS) {
+            double sum[BLK_GPU_BS] = {0};
             for (int l=0; l<k; l++) {
-              double sum[BLK_GPU_BS] = {0};
               for (int i2=0; i2<BLK_GPU_BS; i2++) {
                 sum[i2] += A[i1+i2][l] * B[l][j];
               }
               for (int i2=0; i2<BLK_GPU_BS; i2++) {
                 C[i1+i2][j] = sum[i2];
               }
-            }
-          }
-          else {
+            } 
+          } else {
+            double sum[BLK_GPU_BS] = {0};
             for (int l=0; l<k; l++) {
-              double sum[BLK_GPU_BS] = {0};
               for (int i2=0; i2<m-i1; i2++) {
                 sum[i2] += A[i1+i2][l] * B[l][j];
               }
