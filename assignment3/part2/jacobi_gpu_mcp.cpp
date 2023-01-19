@@ -27,6 +27,8 @@ void jacobi_inner_gpu_mcp(double ***d_u, double ***d_old_u, double ***d_f, const
 }
 
 int jacobi_gpu_mcp(double *** u, double *** old_u, double ***f, const int N, const int iter_max, const double threshold, const bool frobenius) {
+    
+   
     int iter = 0;
     double delta_norm = INFINITY;
 
@@ -36,6 +38,7 @@ int jacobi_gpu_mcp(double *** u, double *** old_u, double ***f, const int N, con
     double*** d_old_u = d_malloc_3d(N+2, N+2, N+2, &d_old_u_data);
     double* d_f_data;
     double*** d_f = d_malloc_3d(N+2, N+2, N+2, &d_f_data);
+
 
     copy_grid_to_device(u[0][0], d_u_data, N+2);
     copy_grid_to_device(f[0][0], d_f_data, N+2);

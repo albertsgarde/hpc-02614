@@ -13,6 +13,7 @@
 #include "jacobi_par.h"
 #include "jacobi_gpu_map.h"
 #include "jacobi_gpu_mcp.h"
+#include "jacobi_gpu_async.h"
 
 #include "init_u.h"
 #include "init_f.h"
@@ -113,6 +114,8 @@ int main(int argc, char* argv[]) {
         poisson_func = jacobi_gpu_map;
     } else if (strcmp(version, "gpu_mcp") == 0) {
         poisson_func = jacobi_gpu_mcp;
+    } else if (strcmp(version, "gpu_async") == 0) {
+        poisson_func = jacobi_gpu_async;
     } else {
         printf("Unknown version: %s", version);
         return 1;

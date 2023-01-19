@@ -12,6 +12,7 @@ OBJS	= warm_up.o \
         jacobi_par.o \
         jacobi_gpu_map.o \
         jacobi_gpu_mcp.o \
+        jacobi_gpu_async.o \
         main.o \
 
 CC	= nvc
