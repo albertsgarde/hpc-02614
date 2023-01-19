@@ -62,75 +62,94 @@ void matmult_blk_omp(int m, int n, int k, const double** A, const double** B, do
 // OFFLOADED VERSIONS
 
 extern "C" {
-  void matmult_mkn_offload(int m, int n, int k, const double** A, const double** B, double** C) {
-    clearC(m, n, C);
+void matmult_mkn_offload(int m, int n, int k, const double** A, const double** B, double** C) {
+  clearC(m, n, C);
 
-    #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) 
-    {
-      #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
-                  num_teams(m) thread_limit(64)
-      for (int i=0; i<m; i++) {
-        #pragma omp loop bind(parallel)
-        for (int l=0; l<k; l++) {
-          for (int j=0; j<n; j++) {
-            C[i][j] += A[i][l] * B[l][j];
-          }
-        }
+  #pragma omp target teams distribute parallel for map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n])
+            //  num_teams(m) thread_limit(64)
+  for (int i=0; i<m; i++) {
+    for (int l=0; l<k; l++) {
+      for (int j=0; j<n; j++) {
+        C[i][j] += A[i][l] * B[l][j];
       }
     }
   }
+}
 }
 
 extern "C" {
   void matmult_mnk_offload(int m, int n, int k, const double** A, const double** B, double** C) {
-    clearC(m, n, C);
-
-    #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) 
-    {
-      #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
-                    num_teams(m) thread_limit(64)
-      for (int i=0; i<m; i++) {
-        #pragma omp loop bind(parallel)
-        for (int j=0; j<n; j++) {
-          double sum = 0;
-          for (int l=0; l<k; l++) {
-            sum += A[i][l] * B[l][j];
-          }
-          C[i][j] = sum;
+    #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
+                  num_teams(m) thread_limit(64)
+    for (int i=0; i<m; i++) {
+      #pragma omp loop bind(parallel)
+      for (int j=0; j<n; j++) {
+        double sum = 0;
+        for (int l=0; l<k; l++) {
+          sum += A[i][l] * B[l][j];
         }
+        C[i][j] = sum;
       }
     }
   }
 }
 
+// extern "C" {
+//   void matmult_blk_offload_2(int m, int n, int k, const double** A, const double** B, double** C) {
+//     #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n])
+//     {
+//       #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
+//               num_teams(m/BLK_GPU_BS) thread_limit(64)
+//       for (int i1=0; i1<m; i1+=BLK_GPU_BS) {
+//         #pragma omp loop bind(parallel)
+//         for (int j=0; j<n; j++) {
+//           double sum[BLK_GPU_BS] = {0};
+//           if (m-i1 > BLK_GPU_BS) {
+//             for (int l=0; l<k; l++) {
+//               for (int i2=0; i2<BLK_GPU_BS; i2++) {
+//                 sum[i2] += A[i1+i2][l] * B[l][j];
+//               }
+//             } 
+//           } 
+//           // else {
+//           //   for (int l=0; l<k; l++) {
+//           //     for (int i2=0; i2<m-i1; i2++) {
+//           //       sum[i2] += A[i1+i2][l] * B[l][j];
+//           //     }
+//           //   }
+//           // }
+//           for (int i2=0; i2<MIN(m-i1, BLK_GPU_BS); i2++) {
+//             C[i1+i2][j] = sum[i2];
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
 extern "C" {
-  void matmult_blk_offload(int m, int n, int k, const double** A, const double** B, double** C) {
-    #pragma omp target data map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n])
-    {
-      #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) map(tofrom:C[:m][:n]) \
-              num_teams(2056) thread_limit(64) collapse(2)
-      for (int i1=0; i1<m; i1+=BLK_GPU_BS) {
-        for (int j=0; j<n; j++) {
-          if (m-i1 > BLK_GPU_BS) {
-            double sum[BLK_GPU_BS] = {0};
-            for (int l=0; l<k; l++) {
-              for (int i2=0; i2<BLK_GPU_BS; i2++) {
-                sum[i2] += A[i1+i2][l] * B[l][j];
-              }
-              for (int i2=0; i2<BLK_GPU_BS; i2++) {
-                C[i1+i2][j] = sum[i2];
-              }
-            } 
-          } else {
-            double sum[BLK_GPU_BS] = {0};
-            for (int l=0; l<k; l++) {
-              for (int i2=0; i2<m-i1; i2++) {
-                sum[i2] += A[i1+i2][l] * B[l][j];
-              }
-              for (int i2=0; i2<m-i1; i2++) {
-                C[i1+i2][j] = sum[i2];
-              }
+  void matmult_blk_offload(int m, int n, int k, const double** A, const double** B, double** C) {    
+    #pragma omp target teams loop map(to:A[:m][:k],B[:k][:n],m,n,k) \
+            map(tofrom:C[:m][:n]) collapse(2)
+    for (int i1=0; i1<m; i1+=BLK_GPU_BS) {
+      for (int j=0; j<n; j++) {
+        if (BLK_GPU_BS < m-i1) {
+          double sum[BLK_GPU_BS] = {0};
+          for (int l=0; l<k; l++) {
+            for (int i2=0; i2<BLK_GPU_BS; i2++) {
+              sum[i2] += A[i1+i2][l] * B[l][j];
             }
+          }
+          for (int i2=0; i2<BLK_GPU_BS; i2++) {
+            C[i1+i2][j] = sum[i2];
+          }
+        } else {
+          for (int i2=0; i2<m-i1; i2++) {
+            double sum = 0.0;
+            for (int l=0; l<k; l++) {
+              sum += A[i1+i2][l] * B[l][j];
+            }
+            C[i1+i2][j] = sum;
           }
         }
       }
