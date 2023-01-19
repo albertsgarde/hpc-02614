@@ -11,7 +11,7 @@ void jacobi_inner_gpu_map(double ***u, double ***old_u, double ***f, const int N
     const double grid_spacing_sq = grid_spacing(N)*grid_spacing(N);
 
     #pragma omp target teams loop map(from: u[0:N+2][0:N+2][0:N+2]) map(to: old_u[0:N+2][0:N+2][0:N+2]) map(to: f[0:N+2][0:N+2][0:N+2]) \
-        collapse(2) num_teams(108) thread_limit(128)
+        collapse(3) num_teams(N*N/4) thread_limit(256)
     for (int i = 1; i < (N + 1); i++){
         for (int j=1; j < (N + 1); j++){
             for (int k=1; k < (N + 1); k++){

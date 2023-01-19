@@ -37,6 +37,7 @@ def run(config: RunConfig):
 
     out, err = process.communicate()
     if process.returncode != 0:
+        print(out)
         print(err)
         sys.exit(1)
     print(str(out))
