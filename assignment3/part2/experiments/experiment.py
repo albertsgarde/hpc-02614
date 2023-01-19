@@ -37,6 +37,7 @@ def run(config: RunConfig):
 
     out, err = process.communicate()
     if process.returncode != 0:
+        print(out)
         print(err)
         sys.exit(1)
     print(str(out))
@@ -52,7 +53,9 @@ def experiment(configs, data_path: str):
     rows = [run(config) for config in configs]
     df = pd.DataFrame(rows, columns=RunConfig.column_names() + ["time", "num_iterations", "error"])
     df["iterations_per_second"] = df[["time", "num_iterations"]].apply(lambda row: row[1]/row[0], axis=1)
-    os.makedirs(os.dirname(data_path))
+    data_dir = os.path.dirname(data_path)
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
     df.to_csv(data_path, index=False)
     return df
 
