@@ -65,3 +65,5 @@ __pycache__/
 poisson_gs
 poisson_j
 poisson
+
+*.nsys-rep
