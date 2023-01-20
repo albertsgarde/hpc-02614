@@ -126,6 +126,8 @@ int main(int argc, char* argv[]) {
         poisson_func = jacobi_gpu_mcp;
     } else if (strcmp(version, "gpu_async") == 0) {
         poisson_func = jacobi_gpu_async;
+    } else if (strcmp(version, "gpu_async_alt") == 0) {
+        poisson_func = jacobi_gpu_async_alt;
     } else {
         printf("Unknown version: %s", version);
         return 1;
