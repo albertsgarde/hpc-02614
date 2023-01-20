@@ -44,12 +44,12 @@ void subtract_arrays(const int N, double ***A, double ***B, double ***C) {
     }
 }
 
-void copy_grid_to_device(double* const host_pointer, double* const device_pointer, const int grid_size) {
-    omp_target_memcpy(device_pointer, host_pointer, grid_size * grid_size * grid_size * sizeof(double),
+int copy_grid_to_device(double* const host_pointer, double* const device_pointer, const int grid_size) {
+    return omp_target_memcpy(device_pointer, host_pointer, grid_size * grid_size * grid_size * sizeof(double),
             0, 0, omp_get_default_device(), omp_get_initial_device());
 }
 
-void copy_grid_from_device(double* const host_pointer, double* const device_pointer, const int grid_size) {
-    omp_target_memcpy(host_pointer, device_pointer, grid_size * grid_size * grid_size * sizeof(double),
+int copy_grid_from_device(double* const host_pointer, double* const device_pointer, const int grid_size) {
+    return omp_target_memcpy(host_pointer, device_pointer, grid_size * grid_size * grid_size * sizeof(double),
             0, 0, omp_get_initial_device(), omp_get_default_device());
 }

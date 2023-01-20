@@ -2,12 +2,12 @@
 #BSUB -J poisson
 #BSUB -o poisson_%J.out
 #BSUB -e poisson_%J.err
-#BSUB -q hpcintro
-#BSUB -n 12
+#BSUB -q hpcintrogpu
+#BSUB -n 16
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 0:05
+#BSUB -W 1:00
 #BSUB -R "span[hosts=1]"
-#BSUB -R "rusage[mem=512]"
+#BSUB -R "rusage[mem=6000]"
 
 # The lock thing when profiling
 export TMPDIR=$__LSF_JOB_TMPDIR__
@@ -20,4 +20,4 @@ make
 echo "Activating python environment."
 . ../../env/bin/activate
 echo "Running experiment script."
-python3 experiments/parallel_running_time.py
+python3 experiments/ex8.py
